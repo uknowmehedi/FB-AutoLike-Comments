@@ -1,1 +1,22 @@
-
+[
+    "তথ্যবহুল—ধাপে ধাপে সাজানো—বোঝা সহজ। খুব উপকারী।",
+    "সময়োপযোগী—টিমকে জানাচ্ছি। ধীরে ধীরে শিখছি।",
+    "পরিষ্কার ব্যাখ্যা—আইডিয়াটা নোট করে রাখলাম। ভবিষ্যতে ব্যবহার করবো।",
+    "ভালো লাগলো—সংগ্রহে রাখলাম। রিসোর্সটা সেভ করলাম।",
+    "চমৎকার—শেয়ার করার জন্য ধন্যবাদ। রিসোর্সটা সেভ করলাম।",
+    "অসাধারণ—ধাপে ধাপে সাজানো—বোঝা সহজ। রিসোর্সটা সেভ করলাম।",
+    "তথ্যবহুল—বাস্তবে প্রয়োগ করবো। রিসোর্সটা সেভ করলাম।",
+    "সংক্ষিপ্ত কিন্তু কার্যকর—রেফারেন্স হিসেবে সেভ করলাম। রিসোর্সটা সেভ করলাম।",
+    "তথ্যবহুল—রেফারেন্স হিসেবে সেভ করলাম। খুব উপকারী।",
+    "বাস্তবসম্মত—বাস্তবে প্রয়োগ করবো। রিসোর্সটা সেভ করলাম।",
+    "Super helpful. Saved for reference. Solid takeaway. Well-structured. Thanks!",
+    "Great. Step-by-step makes it easy. Will put this to use. Huge congrats! Best wishes.",
+    "Super helpful. Learned a lot. Keeping in my notes. Quick win tips. A follow-up would be nice.",
+    "Super helpful. Thanks for sharing. Solid takeaway. Nuanced take. Keep it up.",
+    "Great. Keeping this handy. Learning a lot. Stay strong. More like this please.",
+    "Clear explanation. Will apply in practice. Solid takeaway. Here to help. Thanks!",
+    "Awesome. Looking forward to the next update. Neatly explained. Interesting question. This will help.",
+    "Timely. A link to resources would be great. Solid takeaway. Release looks solid. Thanks!",
+    "Inspiring. Looking forward to the next update. Super relevant. Nice iteration. This will help.",
+    "Great. Thanks for sharing. Keeping in my notes. Great opportunity. More like this please."
+  ]
