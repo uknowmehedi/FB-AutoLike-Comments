@@ -1,0 +1,227 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>FB Auto • React + Comment</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    :root{
+      --bg:#0f0f10; --card:#161719; --muted:#a8a8a8; --fg:#eaeaea;
+      --red:#e11d48; --red-d:#b51b3a; --accent:#d11a3a; --line:#25262a;
+      --green:#22c55e; --green-d:#16a34a; --yellow:#eab308; --blue:#3b82f6;
+    }
+    *{box-sizing:border-box; margin:0; padding:0}
+    body{font:14px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Ubuntu; background:var(--bg); color:var(--fg); margin:0; width:380px}
+    header{display:flex; align-items:center; justify-content:space-between; padding:12px 14px; border-bottom:1px solid var(--line); background:#0c0c0d;}
+    .title{font-weight:700; letter-spacing:.3px}
+    .status{display:flex; align-items:center; gap:8px; color:var(--muted); font-size:12px}
+    .dot{width:8px;height:8px;border-radius:50%; background:#444}
+    .dot.running{background:var(--green)}
+    .dot.cooldown{background:var(--yellow)}
+    .dot.stopped{background:var(--red)}
+    main{padding:12px}
+    .card{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:12px; margin-bottom:12px;}
+    h2{font-size:13px; margin:0 0 8px; color:#f1f1f1;}
+    label{font-size:12px; color:var(--muted); display:block; margin-bottom:4px}
+    input[type=text],input[type=number],textarea,select{
+      width:100%; background:#0e0e0f; color:var(--fg); border:1px solid #2a2a2e; border-radius:8px; padding:8px 10px;
+      outline:none; font:inherit; margin-bottom:8px
+    }
+    textarea{min-height:60px; resize:vertical}
+    .row{display:flex; gap:8px; align-items:center; margin-bottom:8px}
+    .col{flex:1}
+    .btn{border:1px solid #2d2d32; background:#151517; color:var(--fg); padding:8px 12px; border-radius:8px; cursor:pointer; transition:all 0.2s; font:inherit}
+    .btn:hover{background:#1b1c1f}
+    .btn.primary{background:var(--accent); border-color:var(--red-d); color:white}
+    .btn.primary:hover{background:var(--red-d)}
+    .btn.danger{background:#991b1b; border-color:#7f1d1d}
+    .btn.success{background:var(--green-d); border-color:var(--green)}
+    .chip{padding:6px 10px; border-radius:999px; border:1px solid #2d2d32; color:var(--muted); cursor:pointer; transition:all 0.2s}
+    .chip.active{background:#1d1e20; color:#fff; border-color:#3a3b40}
+    small{color:var(--muted); font-size:12px; display:block; margin-top:4px}
+    .list .link-row{display:flex; gap:8px; align-items:center; justify-content:space-between; padding:8px; border:1px dashed #2a2a2e; border-radius:8px; margin-bottom:8px}
+    .url{overflow:hidden; text-overflow:ellipsis; white-space:nowrap; max-width:200px;}
+    .btn.tiny{padding:6px 8px; font-size:12px}
+    .btn.ghost{background:transparent; border-color:#3a3b40}
+    .grid2{display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px}
+    .grid3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; margin-bottom:8px}
+    .status-message{margin-left:12px; font-size:12px; padding:4px 8px; border-radius:4px; align-self:center; transition:all 0.3s}
+    .status-message.success{background:rgba(34, 197, 94, 0.2); color:var(--green)}
+    .status-message.error{background:rgba(239, 68, 68, 0.2); color:var(--red)}
+    .status-message.info{color:var(--muted)}
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+    .tabs{display:flex; gap:4px; margin-bottom:12px; border-bottom:1px solid var(--line); padding-bottom:8px}
+    .tab-btn{padding:8px 12px; border-radius:6px; cursor:pointer; background:#1a1a1d; font-size:12px; border:none; color:var(--fg)}
+    .tab-btn.active{background:var(--accent); color:white}
+    #linksList{max-height:200px; overflow-y:auto; margin:8px 0}
+    input[type=number]{-moz-appearance:textfield}
+    input[type=number]::-webkit-outer-spin-button,
+    input[type=number]::-webkit-inner-spin-button{-webkit-appearance:none; margin:0}
+  </style>
+</head>
+<body>
+  <header>
+    <div class="title">FB Auto • React + Comment</div>
+    <div class="status"><span class="dot stopped" id="statusDot"></span><span id="statusText">Stopped</span></div>
+  </header>
+
+  <main>
+    <div class="card">
+      <div class="row">
+        <button class="btn primary" id="startBtn">▶ Start (this tab)</button>
+        <button class="btn danger" id="stopBtn">🛑 Stop</button>
+      </div>
+      <small>Use separate Start in each tab where you want automation.</small>
+      <div style="margin-top:10px" class="row">
+        <div class="chip active" id="scopeFeed">Newsfeed/Pages/Groups</div>
+        <div class="chip" id="scopeInline">Inline only</div>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="comment">Comment</button>
+      <button class="tab-btn" data-tab="reaction">Reaction</button>
+      <button class="tab-btn" data-tab="rate">Rate & Mix</button>
+      <button class="tab-btn" data-tab="links">Link Manager</button>
+    </div>
+
+    <div class="tab-content active" id="comment-tab">
+      <div class="card">
+        <h2>Comment Builder</h2>
+        <label for="prefix">Prefix (optional)</label>
+        <textarea id="prefix" placeholder="My note:"></textarea>
+        <div class="grid2">
+          <div>
+            <label for="emojiPool">Emoji pool</label>
+            <input id="emojiPool" type="text" value="🙂,🔥,✅,🚀,✨,👍">
+          </div>
+          <div>
+            <label>Emojis per comment (min–max)</label>
+            <div class="row"><input id="emoMin" type="number" value="2" min="1" max="10"><input id="emoMax" type="number" value="3" min="1" max="10"></div>
+          </div>
+        </div>
+        <div class="grid2">
+          <div>
+            <label for="timeFmt">Time format</label>
+            <select id="timeFmt"><option value="HHMMSS">HHMMSS</option><option value="HH:MM:SS">HH:MM:SS</option></select>
+          </div>
+          <div>
+            <label for="contextOn">Context-aware</label>
+            <select id="contextOn"><option value="true">ON</option><option value="false">OFF</option></select>
+          </div>
+        </div>
+        <small>Format: Context sentence + [LINK] + [2–3 EMOJI] + [TIME]</small>
+      </div>
+    </div>
+
+    <div class="tab-content" id="reaction-tab">
+      <div class="card">
+        <h2>Reaction</h2>
+        <div class="grid2">
+          <div>
+            <label for="reactMode">Mode</label>
+            <select id="reactMode">
+              <option value="RANDOM">Random (no Angry)</option>
+              <option value="Like">Like (fixed)</option>
+              <option value="Love">Love (fixed)</option>
+              <option value="Care">Care (fixed)</option>
+              <option value="Haha">Haha (fixed)</option>
+              <option value="Wow">Wow (fixed)</option>
+              <option value="Sad">Sad (fixed)</option>
+            </select>
+          </div>
+          <div>
+            <label for="scrollSpeed">Scroll speed</label>
+            <select id="scrollSpeed">
+              <option value="medium">Medium</option>
+              <option value="slow">Slow</option>
+              <option value="fast">Fast</option>
+            </select>
+          </div>
+        </div>
+        <div class="grid2">
+          <div>
+            <label>Delay between actions (sec) min–max</label>
+            <div class="row"><input id="delayMin" type="number" value="20" min="5" max="120"><input id="delayMax" type="number" value="30" min="5" max="120"></div>
+          </div>
+          <div>
+            <label for="typing">Typing emulation</label>
+            <select id="typing"><option value="true">ON</option><option value="false">OFF</option></select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="rate-tab">
+      <div class="card">
+        <h2>Rate & Mix</h2>
+        <div class="grid3">
+          <div><label for="rate5">Per 5m</label><input id="rate5" type="number" value="4" min="1" max="20"></div>
+          <div><label for="rate60">Per hour</label><input id="rate60" type="number" value="40" min="1" max="100"></div>
+          <div><label for="rateSession">Per session</label><input id="rateSession" type="number" value="60" min="1" max="200"></div>
+        </div>
+        <div class="grid3">
+          <div><label for="coolSession">Session cooldown (min)</label><input id="coolSession" type="number" value="30" min="1" max="240"></div>
+          <div><label for="failN">Fail≥N</label><input id="failN" type="number" value="5" min="1" max="20"></div>
+          <div><label for="coolFail">Fail cooldown (min)</label><input id="coolFail" type="number" value="20" min="1" max="240"></div>
+        </div>
+        <div class="grid3">
+          <div><label for="seeMorePct">See more %</label><input id="seeMorePct" type="number" value="20" min="0" max="100"></div>
+          <div><label for="singlePct">Single-post %</label><input id="singlePct" type="number" value="0" min="0" max="100"></div>
+          <div><label for="authorCap">Same author cap</label><input id="authorCap" type="number" value="2" min="1" max="10"></div>
+        </div>
+        <div class="row">
+          <div class="col"><label for="pageCap">Same page cap</label><input id="pageCap" type="number" value="20" min="1" max="50"></div>
+          <div class="col"><label for="pageCool">Page cooldown (min)</label><input id="pageCool" type="number" value="60" min="1" max="240"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="links-tab">
+      <div class="card">
+        <h2>Link Manager</h2>
+        <label for="linkInput">New link</label>
+        <div class="row">
+          <input id="linkInput" type="text" placeholder="https://your-link.example">
+          <button class="btn" id="saveLink">Save</button>
+        </div>
+        <div class="row">
+          <label class="row"><input id="alwaysAttach" type="checkbox" checked>&nbsp;Always attach link</label>
+          <div class="row" style="margin-left:auto">
+            <label>Attach %</label>&nbsp;<input id="attachProb" type="number" min="0" max="100" value="40" style="width:60px">
+          </div>
+        </div>
+        <div id="linksList" class="list"></div>
+        <small>One ★ Important link is required. When removing important, set new one.</small>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row">
+        <button class="btn success" id="saveSettingsBtn">💾 Save All Settings</button>
+        <span id="saveStatus" class="status-message"></span>
+      </div>
+      <div class="row" style="margin-top:8px;">
+        <button class="btn ghost" id="resetBtn">Reset to defaults</button>
+        <small style="margin-left:auto">v1.2.0</small>
+      </div>
+    </div>
+  </main>
+
+  <!-- New Important Link modal -->
+  <div id="newImpModal" style="position:fixed;inset:0;background:#000a;display:none;align-items:center;justify-content:center;z-index:1000">
+    <div style="background:#111214;border:1px solid #2b2c30;border-radius:12px;padding:16px;width:320px">
+      <h3 style="margin:0 0 8px">New Important Link</h3>
+      <p style="color:#c9c9c9;margin:0 0 8px">Please set a new important link to proceed.</p>
+      <input id="newImpInput" type="text" placeholder="https://new-important.example" style="width:100%;padding:8px;background:#0e0e0f;color:#fff;border:1px solid #2b2c30;border-radius:10px;margin-bottom:12px">
+      <div class="row" style="margin-top:10px">
+        <button class="btn primary" id="newImpOk">Make Important</button>
+        <button class="btn" id="newImpCancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

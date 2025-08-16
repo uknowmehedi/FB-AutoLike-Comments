@@ -1,0 +1,8 @@
+fb-auto-react-comment/
+├─ manifest.json
+├─ popup.html
+├─ popup.js
+├─ service_worker.js
+├─ content.js
+└─ assets/
+   └─ comment_templates_6000.json 
